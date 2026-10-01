@@ -1,0 +1,167 @@
+import React from 'react';
+import { playTransitChime } from '../utils/audio';
+
+interface SettingsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  alertBuffer: number;
+  onSetAlertBuffer: (min: number) => void;
+  walkingSpeed: string;
+  onSetWalkingSpeed: (speed: string) => void;
+  soundEnabled: boolean;
+  onToggleSound: () => void;
+}
+
+export const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen,
+  onClose,
+  alertBuffer,
+  onSetAlertBuffer,
+  walkingSpeed,
+  onSetWalkingSpeed,
+  soundEnabled,
+  onToggleSound
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl max-w-sm w-full p-4.5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto no-scrollbar">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-[#97001d] text-white flex items-center justify-center">
+              <span className="material-symbols-outlined text-[18px]">person</span>
+            </div>
+            <div>
+              <h3 className="font-bold text-[16px] text-slate-900 leading-tight">
+                Commuter Preferences
+              </h3>
+              <span className="text-[11px] text-slate-500">SBS Transit & LTA DataMall 2.0</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+
+        {/* Section 1: Early Alert Lead Time */}
+        <div className="flex flex-col gap-2">
+          <label className="text-[13px] font-bold text-slate-800 flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-[16px] text-[#97001d]">alarm</span>
+            Bus Arrival Alarm Lead Time
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {[2, 3, 5].map((mins) => (
+              <button
+                key={mins}
+                type="button"
+                onClick={() => {
+                  onSetAlertBuffer(mins);
+                  if (soundEnabled) playTransitChime();
+                }}
+                className={`py-2 px-2 rounded-xl text-[12px] font-bold transition-all cursor-pointer ${
+                  alertBuffer === mins
+                    ? 'bg-[#97001d] text-white shadow-xs'
+                    : 'bg-[#ededf9] text-slate-700 hover:bg-[#e7e7f3]'
+                }`}
+              >
+                {mins} min before
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Section 2: Walking Speed */}
+        <div className="flex flex-col gap-2">
+          <label className="text-[13px] font-bold text-slate-800 flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-[16px] text-[#0061a5]">directions_walk</span>
+            Walking Speed (ETA adjustment)
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { id: 'leisure', label: 'Leisurely', val: '3.5 km/h' },
+              { id: 'normal', label: 'Normal', val: '4.5 km/h' },
+              { id: 'brisk', label: 'Brisk', val: '5.5 km/h' }
+            ].map((sp) => (
+              <button
+                key={sp.id}
+                type="button"
+                onClick={() => onSetWalkingSpeed(sp.id)}
+                className={`p-2 rounded-xl text-center flex flex-col items-center transition-all cursor-pointer ${
+                  walkingSpeed === sp.id
+                    ? 'bg-[#0061a5] text-white shadow-xs'
+                    : 'bg-[#ededf9] text-slate-700 hover:bg-[#e7e7f3]'
+                }`}
+              >
+                <span className="text-[11px] font-bold">{sp.label}</span>
+                <span className="text-[9px] opacity-80">{sp.val}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Section 3: Sound & Audio Feedback */}
+        <div className="flex flex-col gap-2 p-3 bg-[#f3f3ff] rounded-2xl border border-slate-200/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[18px] text-[#97001d]">volume_up</span>
+              <span className="text-[13px] font-bold text-slate-900">Transit Audio Chime</span>
+            </div>
+            <button
+              type="button"
+              onClick={onToggleSound}
+              className={`w-12 h-6 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
+                soundEnabled ? 'bg-[#97001d]' : 'bg-slate-300'
+              }`}
+            >
+              <div
+                className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform ${
+                  soundEnabled ? 'translate-x-6' : 'translate-x-0'
+                }`}
+              ></div>
+            </button>
+          </div>
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-[11px] text-slate-500">Audio plays when alarm is triggered.</span>
+            <button
+              type="button"
+              onClick={() => playTransitChime()}
+              className="text-[11px] font-bold text-[#97001d] hover:underline cursor-pointer"
+            >
+              Test Chime
+            </button>
+          </div>
+        </div>
+
+        {/* Section 4: Operational Data Telemetry */}
+        <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-[11px] text-slate-600 flex flex-col gap-1">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-slate-900">Data Feed Authority</span>
+            <span className="font-mono text-emerald-700 font-bold">LTA DataMall v2.0</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>SBS Transit Network Status</span>
+            <span className="font-semibold text-emerald-700">All Lines Normal</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Refresh Protocol</span>
+            <span className="font-mono">Real-time dynamic polling (20s)</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-full py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[14px] hover:bg-slate-800 active:scale-95 transition-all cursor-pointer"
+        >
+          Save & Close
+        </button>
+      </div>
+    </div>
+  );
+};

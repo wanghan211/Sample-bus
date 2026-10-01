@@ -1,0 +1,6 @@
+{
+  "name": "SBS Transit Bus Timings",
+  "description": "Singapore SBS Transit real-time bus arrivals, approach tracker, nearby stops, and route progression powered by LTA DataMall standards.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
